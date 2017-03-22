@@ -102,6 +102,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, event := range envelope.Events {
+		logs.Debug(event.Target.MediaType, schema1.MediaTypeManifest)
 		if event.Target.MediaType != schema1.MediaTypeManifest {
 			continue
 		}
