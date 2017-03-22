@@ -1,39 +1,66 @@
 package main
 
 import (
+	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 
 	"github.com/docker/distribution/notifications"
-	"github.com/songtianyi/rrframework/config"
+	//"github.com/songtianyi/rrframework/config"
+	"github.com/songtianyi/rrframework/connector/redis"
+	"github.com/songtianyi/rrframework/logs"
 	"github.com/songtianyi/rrframework/utils"
 )
 
 var (
-	_ = flag.String("f", "config.json", "config file path")
+	//_ = flag.String("f", "config.json", "config file path")
+	_ = flag.String("listen", "0.0.0.0:8080", "docker-rec http server listen address")
+	_ = flag.String("redis", "0.0.0.0:6379", "redis connection string")
+	_ = flag.String("crt", "certs/domain.crt", "key pair crt file")
+	_ = flag.String("key", "certs/domain.key", "key pair key file")
+)
+
+var (
+	RC  *rrredis.RedisClient
+	err error
 )
 
 func main() {
 
-	if !rrutils.FlagIsSet("f") {
-		rruitls.FlagHelp()
-		return
-	}
+	//if !rrutils.FlagIsSet("f") || !rrutils.FlagIsSet("redis") {
+	//	rrutils.FlagHelp()
+	//	return
+	//}
 
-	path := rrutils.FlagGetString("f")
-	jc, err := rrconfig.LoadJsonConfigFromFile(path)
+	crt, _ := rrutils.FlagGetString("crt")
+	key, _ := rrutils.FlagGetString("key")
+
+	//path, _ := rrutils.FlagGetString("f")
+	//jc, err := rrconfig.LoadJsonConfigFromFile(path)
+	//if err != nil {
+	//	logs.Error(err)
+	//	return
+	//}
+
+	// connect redis
+	connStr, _ := rrutils.FlagGetString("redis")
+	err, RC = rrredis.GetRedisClient(connStr)
 	if err != nil {
 		logs.Error(err)
 		return
 	}
 
+	// listen
+	listen, _ := rrutils.FlagGetString("listen")
 	http.HandleFunc("/events", eventHandler)
-	err = http.ListenAndServeTLS(httpConnectionString, ctx.Config.Server.Ssl.Cert, ctx.Config.Server.Ssl.CertKey, nil)
+	err = http.ListenAndServeTLS(listen, crt, key, nil)
 	if err != nil {
-		glog.Exit(err)
+		logs.Error(err)
+		return
 	}
 
-	glog.Info("Exiting.")
+	logs.Info("Exiting")
 }
 
 func eventHandler(w http.ResponseWriter, req *http.Request) {
@@ -73,15 +100,15 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for index, event := range envelope.Events {
+	for _, event := range envelope.Events {
 
 		// Handle all three cases: push, pull, and delete
 		if event.Action == notifications.EventActionPull || event.Action == notifications.EventActionPush {
-			logs.Info(event.Action, "event")
+			logs.Info(event.Action, "event", event)
 
 		} else if event.Action == notifications.EventActionDelete {
 
-			logs.Info(event.Action, "event")
+			logs.Info(event.Action, "event", event)
 
 		} else {
 
