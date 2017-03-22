@@ -110,7 +110,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 		logs.Debug(event.Target.MediaType, schema1.MediaTypeManifest)
 		if event.Target.MediaType != schema2.MediaTypeManifest &&
 			event.Target.MediaType != schema1.MediaTypeManifest {
-			http.Error(w, fmt.Errorf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest))
+			http.Error(w, fmt.Sprintf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest), http.StatusBadRequest)
 			return
 		}
 
