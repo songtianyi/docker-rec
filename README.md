@@ -7,7 +7,7 @@
 
 
 ## golang.org/x dep install
-	mkdir $GOPATH/src/golang.org/x
+	mkdir -p $GOPATH/src/golang.org/x
 	cd $GOPATH/src/golang.org/x
 	git clone https://github.com/golang/net.git
 	git clone https://github.com/golang/text.git
