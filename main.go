@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/docker/distribution/manifest/schema1"
+	"github.com/docker/distribution/manifest/schema2"
 	"github.com/docker/distribution/notifications"
 	//"github.com/songtianyi/rrframework/config"
 	"github.com/songtianyi/rrframework/connector/redis"
@@ -107,7 +108,8 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 
 	for _, event := range envelope.Events {
 		logs.Debug(event.Target.MediaType, schema1.MediaTypeManifest)
-		if event.Target.MediaType != schema1.MediaTypeManifest {
+		if event.Target.MediaType != schema2.MediaTypeManifest &&
+			event.Target.MediaType != schema1.MediaTypeManifest {
 			continue
 		}
 
