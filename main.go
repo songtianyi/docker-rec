@@ -33,8 +33,8 @@ func main() {
 	//	return
 	//}
 
-	crt, _ := rrutils.FlagGetString("crt")
-	key, _ := rrutils.FlagGetString("key")
+	//crt, _ := rrutils.FlagGetString("crt")
+	//key, _ := rrutils.FlagGetString("key")
 
 	//path, _ := rrutils.FlagGetString("f")
 	//jc, err := rrconfig.LoadJsonConfigFromFile(path)
@@ -54,7 +54,7 @@ func main() {
 	// listen
 	listen, _ := rrutils.FlagGetString("listen")
 	http.HandleFunc("/events", eventHandler)
-	err = http.ListenAndServeTLS(listen, crt, key, nil)
+	err = http.ListenAndServe(listen, nil)
 	if err != nil {
 		logs.Error(err)
 		return
