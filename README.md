@@ -12,8 +12,12 @@
 	git clone https://github.com/golang/net.git
 	git clone https://github.com/golang/text.git
 
-## Note about certificates
-
-Please note, that the DREC only works with HTTPS and so you must specify a
-certificate and a key file. There are default files you can use for testing but
-you should definitively create your own files.
+## docker registery notification setup
+    notifications:
+      endpoints:
+        - name: docker-rec
+          disabled: false
+          url: https://x.x.x.x:8080/events
+          timeout: 500ms
+          threshold: 5
+          backoff: 1s

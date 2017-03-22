@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/docker/distribution/manifest/schema1"
 	"github.com/docker/distribution/notifications"
 	//"github.com/songtianyi/rrframework/config"
 	"github.com/songtianyi/rrframework/connector/redis"
@@ -101,6 +102,9 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, event := range envelope.Events {
+		if event.Target.MediaType != schema1.MediaTypeManifest {
+			continue
+		}
 
 		// Handle all three cases: push, pull, and delete
 		if event.Action == notifications.EventActionPull || event.Action == notifications.EventActionPush {
