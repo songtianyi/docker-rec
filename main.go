@@ -73,12 +73,14 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 
 	// A request needs to be made via POST
 	if req.Method != "POST" {
+		logs.Error("not post")
 		http.Error(w, fmt.Sprintf("Ignoring request. Required method is \"POST\" but got \"%s\".\n", req.Method), http.StatusOK)
 		return
 	}
 
 	// A request must have a body.
 	if req.Body == nil {
+		logs.Error("body is nil")
 		http.Error(w, "Ignoring request. Required non-empty request body.\n", http.StatusOK)
 		return
 	}
@@ -88,6 +90,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 	// picky about the mimetype. But we are and let the caller know this.
 	contentType := req.Header.Get("Content-Type")
 	if contentType != notifications.EventsMediaType {
+		logs.Error("Content-Type invalid")
 		http.Error(w, fmt.Sprintf("Ignoring request. Required mimetype is \"%s\" but got \"%s\"\n", notifications.EventsMediaType, contentType), http.StatusOK)
 		return
 	}
@@ -97,6 +100,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 	var envelope notifications.Envelope
 	err := decoder.Decode(&envelope)
 	if err != nil {
+		logs.Error("Failed to decode envelope")
 		http.Error(w, fmt.Sprintf("Failed to decode envelope: %s\n", err), http.StatusBadRequest)
 		return
 	}
