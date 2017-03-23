@@ -107,27 +107,22 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, event := range envelope.Events {
-		logs.Debug(event.Target.MediaType, schema1.MediaTypeManifest)
+
 		if event.Target.MediaType != schema2.MediaTypeManifest &&
 			event.Target.MediaType != schema1.MediaTypeManifest {
-			continue
+			http.Error(w, fmt.Sprintf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest), http.StatusBadRequest)
 		}
-
-		// Handle all three cases: push, pull, and delete
-		if event.Action == notifications.EventActionPull || event.Action == notifications.EventActionPush {
+		switch event.Action {
+		case notifications.EventActionPull:
 			logs.Info(event.Action, "event", event)
-
-		} else if event.Action == notifications.EventActionDelete {
-
+		case notifications.EventActionPush:
 			logs.Info(event.Action, "event", event)
-
-		} else {
-
-			http.Error(w, fmt.Sprintf("Invalid event action: %s\n", event.Action), http.StatusBadRequest)
+		case notifications.EventActionDelete:
+			logs.Info(event.Action, "event", event)
+		default:
+			http.Error(w, fmt.Sprintf("Invalid event action: %s\n", event.Action), http.StatusOK)
 			return
-
 		}
-
 	}
 
 	http.Error(w, fmt.Sprintf("Done\n"), http.StatusOK)
