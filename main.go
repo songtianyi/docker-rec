@@ -95,7 +95,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, fmt.Sprintf("Ignoring request. Required mimetype is \"%s\" but got \"%s\"\n", notifications.EventsMediaType, contentType), http.StatusOK)
 		return
 	}
-	logs.Debug("contentType", contentType)
+	logs.Critical(notifications.EventsMediaType, contentType)
 
 	// Try to decode HTTP body as Docker notification envelope
 	decoder := json.NewDecoder(req.Body)
@@ -114,14 +114,11 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, fmt.Sprintf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest), http.StatusOK)
 			return
 		}
-		logs.Debug(event.Timestamp, event.Target.MediaType, event.Target.Repository+":"+event.Target.Tag)
+		logs.Debug(event.Action, "event", event.Timestamp, event.Target.MediaType, event.Target.Repository+":"+event.Target.Tag, event.Request.Addr)
 		switch event.Action {
 		case notifications.EventActionPull:
-			logs.Info(event.Action, "event")
 		case notifications.EventActionPush:
-			logs.Info(event.Action, "event")
 		case notifications.EventActionDelete:
-			logs.Info(event.Action, "event")
 		default:
 			http.Error(w, fmt.Sprintf("Invalid event action: %s\n", event.Action), http.StatusOK)
 			return
