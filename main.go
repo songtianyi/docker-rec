@@ -95,7 +95,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, fmt.Sprintf("Ignoring request. Required mimetype is \"%s\" but got \"%s\"\n", notifications.EventsMediaType, contentType), http.StatusOK)
 		return
 	}
-	logs.Debug(contentType)
+	logs.Debug("contentType", contentType)
 
 	// Try to decode HTTP body as Docker notification envelope
 	decoder := json.NewDecoder(req.Body)
