@@ -21,11 +21,13 @@ var (
 	_ = flag.String("redis", "0.0.0.0:6379", "redis connection string")
 	_ = flag.String("crt", "certs/domain.crt", "key pair crt file")
 	_ = flag.String("key", "certs/domain.key", "key pair key file")
+	_ = flag.String("registry", "cn-sh2.ugchub.service.ucloud.cn", "registry domain")
 )
 
 var (
-	RC  *rrredis.RedisClient
-	err error
+	RC       *rrredis.RedisClient
+	err      error
+	registry string
 )
 
 func main() {
@@ -52,6 +54,8 @@ func main() {
 		logs.Error(err)
 		return
 	}
+
+	registry, _ = rrutils.FlagGetString("registry")
 
 	// listen
 	listen, _ := rrutils.FlagGetString("listen")
@@ -95,7 +99,6 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, fmt.Sprintf("Ignoring request. Required mimetype is \"%s\" but got \"%s\"\n", notifications.EventsMediaType, contentType), http.StatusOK)
 		return
 	}
-	logs.Critical(notifications.EventsMediaType, contentType)
 
 	// Try to decode HTTP body as Docker notification envelope
 	decoder := json.NewDecoder(req.Body)
@@ -111,8 +114,8 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 
 		if event.Target.MediaType != schema2.MediaTypeManifest &&
 			event.Target.MediaType != schema1.MediaTypeManifest {
-			http.Error(w, fmt.Sprintf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest), http.StatusOK)
-			return
+			//http.Error(w, fmt.Sprintf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest), http.StatusOK)
+			continue
 		}
 		logs.Debug(event.Action, "event", event.Timestamp, event.Target.MediaType, event.Target.Repository+":"+event.Target.Tag, event.Request.Addr)
 		switch event.Action {
