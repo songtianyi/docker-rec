@@ -5,9 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"regexp"
 
-	"github.com/docker/distribution/manifest/schema1"
-	"github.com/docker/distribution/manifest/schema2"
+	//"github.com/docker/distribution/manifest/schema1"
+	//"github.com/docker/distribution/manifest/schema2"
 	"github.com/docker/distribution/notifications"
 	//"github.com/songtianyi/rrframework/config"
 	"github.com/songtianyi/rrframework/connector/redis"
@@ -22,6 +23,10 @@ var (
 	_ = flag.String("crt", "certs/domain.crt", "key pair crt file")
 	_ = flag.String("key", "certs/domain.key", "key pair key file")
 	_ = flag.String("registry", "cn-sh2.ugchub.service.ucloud.cn", "registry domain")
+)
+
+const (
+	manifestPattern = `^application/vnd.docker.distribution.manifest.v\d\+(json|prettyjws)`
 )
 
 var (
@@ -112,11 +117,16 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 
 	for _, event := range envelope.Events {
 
-		if event.Target.MediaType != schema2.MediaTypeManifest &&
-			event.Target.MediaType != schema1.MediaTypeManifest {
-			http.Error(w, fmt.Sprintf("Wrong event.Target.MediaType: \"%s\". Expected: \"%s\" or \"%s\"", event.Target.MediaType, schema2.MediaTypeManifest, schema1.MediaTypeManifest), http.StatusOK)
-			return
+		isManifest, err := regexp.MatchString(manifestPattern, event.Target.MediaType)
+		if err != nil {
+			logs.Error(err)
+			continue
 		}
+
+		if !isManifest {
+			continue
+		}
+
 		logs.Debug(event.Action, "event", event.Timestamp, event.Target.MediaType, event.Target.Repository+":"+event.Target.Tag, event.Request.Addr, event.Request.UserAgent)
 		switch event.Action {
 		case notifications.EventActionPull:
