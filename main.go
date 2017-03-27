@@ -145,7 +145,7 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func doIncrement(action string) {
-	key := registry + ":" + action + "COUNT"
+	key := registry + ":" + action + ":COUNT"
 	after, err := RC.Incr(key)
 	if err != nil {
 		logs.Error(err)
