@@ -130,8 +130,11 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 		logs.Debug(event.Action, "event", event.Timestamp, event.Target.MediaType, event.Target.Repository+":"+event.Target.Tag, event.Request.Addr, event.Request.UserAgent)
 		switch event.Action {
 		case notifications.EventActionPull:
+			doIncrement("PULL")
 		case notifications.EventActionPush:
+			doIncrement("PUSH")
 		case notifications.EventActionDelete:
+			doIncrement("DELETE")
 		default:
 			http.Error(w, fmt.Sprintf("Invalid event action: %s\n", event.Action), http.StatusOK)
 			return
@@ -139,4 +142,14 @@ func eventHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	http.Error(w, fmt.Sprintf("Done\n"), http.StatusOK)
+}
+
+func doIncrement(action string) {
+	key := registry + ":" + action + "COUNT"
+	after, err := RC.Incr(key)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	logs.Debug(action, "curr", after)
 }
