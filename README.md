@@ -12,7 +12,7 @@
 	git clone https://github.com/golang/net.git
 	git clone https://github.com/golang/text.git
 
-## docker registery notification setup
+## docker registry notification setup
     notifications:
       endpoints:
         - name: docker-rec
