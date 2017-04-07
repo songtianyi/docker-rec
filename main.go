@@ -7,10 +7,7 @@ import (
 	"net/http"
 	"regexp"
 
-	//"github.com/docker/distribution/manifest/schema1"
-	//"github.com/docker/distribution/manifest/schema2"
 	"github.com/docker/distribution/notifications"
-	//"github.com/songtianyi/rrframework/config"
 	"github.com/songtianyi/rrframework/connector/redis"
 	"github.com/songtianyi/rrframework/logs"
 	"github.com/songtianyi/rrframework/utils"
