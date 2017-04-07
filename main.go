@@ -17,11 +17,8 @@ import (
 )
 
 var (
-	//_ = flag.String("f", "config.json", "config file path")
 	_ = flag.String("listen", "0.0.0.0:8080", "docker-rec http server listen address")
 	_ = flag.String("redis", "0.0.0.0:6379", "redis connection string")
-	_ = flag.String("crt", "certs/domain.crt", "key pair crt file")
-	_ = flag.String("key", "certs/domain.key", "key pair key file")
 	_ = flag.String("registry", "cn-sh2.ugchub.service.ucloud.cn", "registry domain")
 )
 
@@ -36,21 +33,6 @@ var (
 )
 
 func main() {
-
-	//if !rrutils.FlagIsSet("f") || !rrutils.FlagIsSet("redis") {
-	//	rrutils.FlagHelp()
-	//	return
-	//}
-
-	//crt, _ := rrutils.FlagGetString("crt")
-	//key, _ := rrutils.FlagGetString("key")
-
-	//path, _ := rrutils.FlagGetString("f")
-	//jc, err := rrconfig.LoadJsonConfigFromFile(path)
-	//if err != nil {
-	//	logs.Error(err)
-	//	return
-	//}
 
 	// connect redis
 	connStr, _ := rrutils.FlagGetString("redis")
